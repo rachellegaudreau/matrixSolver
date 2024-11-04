@@ -43,7 +43,7 @@ int** subtractMatrix(int** num1, int** num2, int row, int col){
 int** multMatrix(int** num1, int** num2, int row, int col){
     if(row != col){
         printf("Columns and Rows do not match!!\n");
-        return;
+        return 0;
     }
     int** result = getMatrix(row, col);
     for(int j=0; j<row;j++){
@@ -71,19 +71,20 @@ int detMatrix(int** matrix, int row, int col){
     }
     for(int i = 0; i<row; i++){
         int** newMatrix = getMatrix(row-1,col-1);
-        //fill new matrix
+        // segmentation fault from the jump i think
         int jump = 0;
         for(int r=0; r<row-1; r++){
             for(int c=1; c<col; c++){
                 if(r==i){
-                    jump++;
+		  jump++;
                     newMatrix[r][c-1]= matrix[r+jump][c];
                     continue;
                 }
                 newMatrix[r][c-1]= matrix[r+jump][c];
             }
         }
-        result = result + pow((-1),row+1)*matrix[0][i]*detMatrix(newMatrix,row-1,col-1);
+	//got rid of the pow() function, doesnt work
+        result = result + matrix[0][i]*detMatrix(newMatrix,row-1,col-1);
     }
     return result;
 }
@@ -154,7 +155,9 @@ int main(int argc, char **argv){
     printMatrix(subtractMatrix(matrixOne,matrixTwo,row,col),row,col);
     printf("Matrix Product: \n");
     printMatrix(multMatrix(matrixOne,matrixTwo,row,col), row, col); 
-
+    printf("Matrix One Determinant: \n");
+    printf(" %d \n", detMatrix(matrixOne, row, col));
+    
     for(int i = 0; i < row; i++){
         free(matrixOne[i]);
         free(matrixTwo[i]);
