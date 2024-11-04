@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-// TODO: Implement functions to add, subtract, multiply these matrices. Then output their result. 
+
 void printMatrix(int** matrix, int row, int col){
     for(int j = 0; j < row; j++){
         for(int i = 0; i < col; i++){
@@ -10,11 +11,17 @@ void printMatrix(int** matrix, int row, int col){
         printf("\n");
     }
 }
-int** addMatrix(int ** num1, int ** num2, int row, int col){
+
+int** getMatrix(int row, int col){
     int **result = (int**)malloc(sizeof(int*)*row);
     for(int i = 0; i < row; i++){
         result[i] = (int*)malloc(sizeof(int)*col);
     }
+    return result;
+}
+
+int** addMatrix(int ** num1, int ** num2, int row, int col){
+    int** result = getMatrix(row, col);
     for(int j=0; j<row;j++){
         for(int i=0; i<col;i++){
             result[j][i]=num1[j][i]+num2[j][i];
@@ -24,10 +31,7 @@ int** addMatrix(int ** num1, int ** num2, int row, int col){
 }
 
 int** subtractMatrix(int** num1, int** num2, int row, int col){
-    int **result = (int**)malloc(sizeof(int*)*row);
-    for(int i = 0; i < row; i++){
-        result[i] = (int*)malloc(sizeof(int)*col);
-    }
+    int** result = getMatrix(row, col);
     for(int j=0; j<row;j++){
         for(int i=0; i<col;i++){
             result[j][i]=num1[j][i]-num2[j][i];
@@ -41,14 +45,45 @@ int** multMatrix(int** num1, int** num2, int row, int col){
         printf("Columns and Rows do not match!!\n");
         return;
     }
-    int **result = (int**)malloc(sizeof(int*)*row);
-    for(int i = 0; i < row; i++){
-        result[i] = (int*)malloc(sizeof(int)*col);
-    }
+    int** result = getMatrix(row, col);
     for(int j=0; j<row;j++){
         for(int i=0; i<col;i++){
             result[j][i]= result[j][i] + (num1[j][i] * num2[j][i]);
         }
+    }
+    return result;
+}
+
+// determinant
+// (-1)^(row+col)row1entry1(recursive)+(-1)^(row+col)row1entry2(recursive)...
+// lets use col1 and go through rows
+// det of matrix without first col or i row
+
+int detMatrix(int** matrix, int row, int col){
+    int result = 0;
+    if(row!=col){
+        printf("Cannot compute determinant for non-square matrix!");
+        return 0;
+    }
+    if(row==2 && col==2){
+        int detSmall = (matrix[0][0]*matrix[1][1])-(matrix[0][1]*matrix[1][0]);
+        return detSmall;
+    }
+    for(int i = 0; i<row; i++){
+        int** newMatrix = getMatrix(row-1,col-1);
+        //fill new matrix
+        int jump = 0;
+        for(int r=0; r<row-1; r++){
+            for(int c=1; c<col; c++){
+                if(r==i){
+                    jump++;
+                    newMatrix[r][c-1]= matrix[r+jump][c];
+                    continue;
+                }
+                newMatrix[r][c-1]= matrix[r+jump][c];
+            }
+        }
+        result = result + pow((-1),row+1)*matrix[0][i]*detMatrix(newMatrix,row-1,col-1);
     }
     return result;
 }
