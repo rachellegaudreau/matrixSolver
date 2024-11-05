@@ -54,13 +54,9 @@ int** multMatrix(int** num1, int** num2, int row, int col){
     return result;
 }
 
-// determinant
-// (-1)^(row+col)row1entry1(recursive)+(-1)^(row+col)row1entry2(recursive)...
-// lets use col1 and go through rows
-// det of matrix without first col or i row
-
 int detMatrix(int** matrix, int row, int col){
     int result = 0;
+    int sign=0;
     if(row!=col){
         printf("Cannot compute determinant for non-square matrix!");
         return 0;
@@ -71,20 +67,21 @@ int detMatrix(int** matrix, int row, int col){
     }
     for(int i = 0; i<row; i++){
         int** newMatrix = getMatrix(row-1,col-1);
-        // segmentation fault from the jump i think
         int jump = 0;
         for(int r=0; r<row-1; r++){
             for(int c=1; c<col; c++){
-                if(r==i){
+                if(r==i && c==1){
 		  jump++;
-                    newMatrix[r][c-1]= matrix[r+jump][c];
-                    continue;
                 }
                 newMatrix[r][c-1]= matrix[r+jump][c];
             }
         }
-	//got rid of the pow() function, doesnt work
-        result = result + matrix[0][i]*detMatrix(newMatrix,row-1,col-1);
+	if((i)%2==0){
+	  sign=1;
+	} else {
+	  sign=-1;
+	}
+        result = result+sign*matrix[i][0]*detMatrix(newMatrix,row-1,col-1);
     }
     return result;
 }
